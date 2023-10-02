@@ -12,14 +12,14 @@
 
 Integrative Programming and Technologies Chat Application group project with socket.io, nodejs, mysql and quasar(vuejs framework).
 
-### Installation
+### Frontend dependencies installation
 
 ```bash
 cd ipt-chat-app
 npm install
 quasar dev
 ```
-## Backend dependencies installation and run 
+## Backend dependencies installation
 ```bash
 cd ipt-backend
 npm install
