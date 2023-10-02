@@ -1,4 +1,4 @@
-# Project Name
+# IPT Chat Application
 
 ## Group Members
 
