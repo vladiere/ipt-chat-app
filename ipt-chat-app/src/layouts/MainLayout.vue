@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lff">
-    <q-header bordered class="bg-grey-3 text-dark">
+    <q-header bordered class="bg-purple-13 text-white">
       <q-toolbar>
         <q-toolbar-title>{{ pathName }}</q-toolbar-title>
         <q-btn
@@ -28,10 +28,10 @@
           <q-avatar size="56px" class="q-mb-sm bg-blue text-capitalize">
             {{ userStore.fullname.charAt(0) }}
           </q-avatar>
-          <div class="text-weight-bold text-capitalize">
+          <div class="text-weight-bold text-white bg-purple-13 rounded-borders text-capitalize text-left q-pl-sm" style="width: 50%;">
             {{ userStore.fullname }}
+            @{{ userStore.username }}
           </div>
-          <div>@{{ userStore.username }}</div>
         </div>
       </q-img>
 

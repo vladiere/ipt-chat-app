@@ -64,13 +64,14 @@
             flat
             label="Back to Login"
             no-caps
+            color="blue-10"
             class="self-center"
             icon="mdi-arrow-left"
             rounded
             to="/"
           />
           <q-btn
-            color="teal"
+            color="purple-13"
             label="Register"
             type="submit"
             class="self-center"
