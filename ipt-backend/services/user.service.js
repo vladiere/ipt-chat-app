@@ -40,16 +40,15 @@ const login = async (user_data) => {
                         message: error.message
                     });
                 } else if (result) {
-                    signedJWT(user, (_error, token) => {
+                    signedJWT(user, (_error, accessToken, refreshToken) => {
                         if (_error) {
                             reject({
                                 message: error.message
                             });
-                        } else if (token) {
+                        } else if (accessToken && refreshToken) {
                             resolve({
-                                id: user[0].user_id,
-                                fullname: user[0].firstname + ' ' + user[0].lastname,
-                                token
+                                accessToken,
+                                refreshToken
                             });
                         }
                     });
@@ -70,6 +69,23 @@ const login = async (user_data) => {
     }
 }
 
+const logout = async (refreshToken) => {
+    try {
+        const query = `DELETE FROM refresh_token WHERE refresh_token = '${refreshToken}'`;
+        const connection = await Connect();
+        const result = await Query(connection, query);
+
+        if (result.affectedRows === 1) {
+            return { message: 'Logout Successfully', status_code: 200 }
+          } else {
+            return result;
+          };
+    } catch (error) {
+        console.error(error.message)
+        return error;
+    }    
+}
+
 const getUserData = async (user_id) => {
     try {
         let query = `SELECT * FROM user_table WHERE user_id = ${user_id};`
@@ -87,4 +103,5 @@ const getUserData = async (user_id) => {
     }
 }
 
-module.exports = { login, register, getUserData };
+
+module.exports = { login, register, logout, getUserData };

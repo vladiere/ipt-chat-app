@@ -26,6 +26,19 @@ const loginUser = async (req, res) => {
     }
 }
 
+const logoutUser = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+
+        const result = await userService.logout(refreshToken);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(error);
+    }
+}
+
 const getUserData = async (req, res) => {
     try {
         const { user_id } = req.body;
@@ -42,5 +55,6 @@ const getUserData = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    getUserData
+    getUserData,
+    logoutUser
 }

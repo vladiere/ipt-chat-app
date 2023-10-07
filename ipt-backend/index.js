@@ -1,8 +1,10 @@
 const express = require('express');
-const userRoute = require('./routers/user.route');
 const bodyParser = require('body-parser');
 const socketIOService = require('./services/websocket.service');
 const cors = require('cors');
+
+const userRoute = require('./routers/user.route');
+const refreshROuter = require('./routers/refresh.route')
 
 const app = express();
 const PORT = 8080;
@@ -26,6 +28,7 @@ app.use((req, res, next) => {
 
 
 app.use('/api/user/', userRoute);
+app.use('/api/user/', refreshROuter);
 
 app.use((req, res, next) => {
     const error = new Error('Not Found');

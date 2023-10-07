@@ -11,8 +11,8 @@ const initializeWebSocket = (server) => {
     io.on('connection', (socket) => {
         console.info('A user connected Socket ID: ', socket.id);
 
-        socket.on('disconnect', () => {
-            console.info('A user disconnected');
+        socket.on('disconnect', (reason) => {
+            console.info('A user disconnected: ', reason);
         });
 
         socket.on('sendMessage', (data) => {

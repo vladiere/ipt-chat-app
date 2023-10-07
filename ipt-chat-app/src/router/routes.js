@@ -1,3 +1,5 @@
+import { SessionStorage } from "quasar";
+
 const routes = [
   {
     path: "/",
@@ -19,6 +21,14 @@ const routes = [
         component: () => import("pages/DiscoverNewPeople.vue"),
       },
     ],
+    beforeEnter: (to, from, next) => {
+      // Check if there is a token in the session storage
+      if (!SessionStorage.getItem("token")) {
+        next("/login");
+      } else {
+        next();
+      }
+    },
   },
   {
     path: "/login",

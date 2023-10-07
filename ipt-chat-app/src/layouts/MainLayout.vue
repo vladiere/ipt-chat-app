@@ -28,7 +28,10 @@
           <q-avatar size="56px" class="q-mb-sm bg-blue text-capitalize">
             {{ userStore.fullname.charAt(0) }}
           </q-avatar>
-          <div class="text-weight-bold text-white bg-purple-13 rounded-borders text-capitalize text-left q-pl-sm" style="width: 50%;">
+          <div
+            class="text-weight-bold text-white bg-purple-13 rounded-borders text-capitalize text-left q-pl-sm"
+            style="width: 50%"
+          >
             {{ userStore.fullname }}
             @{{ userStore.username }}
           </div>
@@ -63,11 +66,12 @@ import { defineComponent, onMounted, ref, watchEffect } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import FriendListComponent from "src/components/FriendList/FriendListChatComponent.vue";
 import { useRoute, useRouter } from "vue-router";
-import { socket } from "boot/socket.io";
-import { useQuasar } from "quasar";
+import { socket } from "src/functions/socket.io";
 import { api } from "src/boot/axios";
 import { useUserStore } from "stores/user.store";
+import { SessionStorage } from "quasar";
 import BgUser from "src/assets/bg-user.svg";
+import jwt_decode from "jwt-decode";
 
 defineComponent({
   name: "MainLayout",
@@ -152,33 +156,44 @@ const drawer = ref(false);
 const messageData = msgData;
 const essentialLinks = linksList;
 const pathName = ref("");
-const $q = useQuasar();
 const userStore = useUserStore();
+const decoded = jwt_decode(SessionStorage.getItem("token"));
 
-const handleLogout = () => {
-  socket.on("disconnect", () => {
-    console.log("Disconnected");
-  });
-  $q.sessionStorage.clear();
-  userStore.clearUser();
-  router.push("/login");
+const handleLogout = async () => {
+  try {
+    const response = await api.post(
+      "/user/logout",
+      { refreshToken: SessionStorage.getItem("refresh") },
+      {
+        headers: {
+          Authorization: `Bearer ${SessionStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (response.data.status_code === 200) {
+      socket.on("disconnect", () => {
+        console.log("Disconnected");
+      });
+      SessionStorage.clear();
+      userStore.clearUser();
+      router.push("/login");
+    } else {
+      throw new Error("Something went wrong!.");
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
 };
-
-socket.on("loggedIn", (data) => {
-  console.info(data);
-});
 
 const getUserData = async () => {
   try {
-    const token = $q.sessionStorage.getItem("token").split(" ")[1] || null;
-    const user_id = $q.sessionStorage.getItem("token").split(" ")[0];
-
     const response = await api.post(
       "/user/get/all",
-      { user_id: user_id },
+      { user_id: decoded.user_id },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${SessionStorage.getItem("token")}`,
         },
       }
     );
@@ -191,10 +206,11 @@ const getUserData = async () => {
 };
 
 onMounted(() => {
+  socket.on("connect", () => {
+    console.info("you are connected!");
+  });
+
   getUserData();
-  if ($q.sessionStorage.getItem("token") === null) {
-    router.push("/login");
-  }
 });
 
 watchEffect(() => {

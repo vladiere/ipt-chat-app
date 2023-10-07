@@ -15,9 +15,9 @@ const verifyToken = async (req, res, next) => {
 
     const token = authHeader.slice(7);
 
-    jwt.verify(token, config.token.secret, (err, decoded) => {
+    jwt.verify(token, config.token.accessSecret, (err, decoded) => {
         if (err) {
-            console.error('Something is wrong in verifying TOKEN');
+            console.error('Something is wrong in verifying TOKEN', err);
             return res.status(500).json({ message: 'Unauthorize: Invalid TOKEN'});
         }
 
