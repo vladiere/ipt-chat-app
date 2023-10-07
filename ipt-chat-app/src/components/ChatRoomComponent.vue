@@ -2,11 +2,11 @@
   <div
     class="row q-pa-sm bg-grey-3 justify-center items-center q-gutter-x-md shadow-2 text-capitalize"
   >
-    <q-avatar avatar size="3em" class="bg-primary"> J </q-avatar>
+    <q-avatar avatar size="3em" class="bg-orange text-dark"> J </q-avatar>
     <span class="text-bold">Jane</span>
   </div>
   <q-virtual-scroll
-    style="max-height: 518px; overflow-x: hidden"
+    style="max-height: 520px; overflow-x: hidden"
     class="q-pa-sm"
     :items="msgData"
     separator
@@ -25,7 +25,6 @@
     <q-input
       placeholder="Type your messages..."
       v-model="myMsg"
-      autogrow
       outlined
       square
       dense

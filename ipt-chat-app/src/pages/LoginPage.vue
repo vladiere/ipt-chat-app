@@ -10,8 +10,8 @@
               style="width: 10%"
             />
             <div class="row text-h3 text-bold">
-              <span class="bg-purple-13 q-px-md text-white">Amici</span>
-              <span class="text-blue-10">Viestintä</span>
+              <span class="text-dark">Amici</span>
+              <span class="bg-orange text-dark q-px-md">Viestintä</span>
             </div>
             <div class="text-h5 text-grey-10">
               "Unlock Connections, Embrace Friendship - Welcome to Amici
@@ -32,7 +32,8 @@
               label="Username"
               v-model="form.username"
               outlined
-              filled
+              color="orange"
+              label-color="dark"
               :rules="[
                 (val) =>
                   (val && val.length > 0) || 'Please enter your username',
@@ -41,7 +42,8 @@
             <q-input
               label="Password"
               outlined
-              filled
+              color="orange"
+              label-color="dark"
               v-model="form.password"
               :type="isPwd ? 'password' : 'text'"
               :rules="[
@@ -59,18 +61,12 @@
             </q-input>
             <q-btn
               label="Login"
-              color="purple-13"
-              text-color="grey-3"
+              color="orange"
+              text-color="grey-10"
               type="submit"
               :loading="loading"
             />
-            <q-btn
-              label="Register"
-              no-caps
-              color="blue-10"
-              flat
-              to="/register"
-            />
+            <q-btn label="Register" no-caps color="dark" flat to="/register" />
           </q-form>
         </div>
       </template>

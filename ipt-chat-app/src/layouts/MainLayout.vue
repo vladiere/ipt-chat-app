@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lff">
-    <q-header bordered class="bg-purple-13 text-white">
+    <q-header bordered class="bg-orange text-dark">
       <q-toolbar>
         <q-toolbar-title>{{ pathName }}</q-toolbar-title>
         <q-btn
@@ -23,13 +23,21 @@
         />
       </q-list>
 
-      <q-img class="absolute-top" :src="BgUser" style="height: 150px">
+      <q-img
+        class="absolute-top"
+        fit="fill"
+        :src="BgUser"
+        style="height: 150px"
+      >
         <div class="absolute-bottom bg-transparent">
-          <q-avatar size="56px" class="q-mb-sm bg-blue text-capitalize">
+          <q-avatar
+            size="56px"
+            class="q-mb-sm bg-orange text-dark text-capitalize"
+          >
             {{ userStore.fullname.charAt(0) }}
           </q-avatar>
           <div
-            class="text-weight-bold text-white bg-purple-13 rounded-borders text-capitalize text-left q-pl-sm"
+            class="text-weight-bold text-capitalize text-left q-pl-sm"
             style="width: 50%"
           >
             {{ userStore.fullname }}
@@ -70,7 +78,7 @@ import { socket } from "src/functions/socket.io";
 import { api } from "src/boot/axios";
 import { useUserStore } from "stores/user.store";
 import { SessionStorage } from "quasar";
-import BgUser from "src/assets/bg-user.svg";
+import BgUser from "src/assets/chathub.png";
 import jwt_decode from "jwt-decode";
 
 defineComponent({

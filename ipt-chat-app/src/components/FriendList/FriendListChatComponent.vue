@@ -1,7 +1,7 @@
 <template>
   <q-item clickable v-ripple @click="convertsationFunction(user_id)">
     <q-item-section avatar>
-      <q-avatar size="3em" class="q-mb-sm bg-blue text-capitalize">
+      <q-avatar size="3em" class="q-mb-sm bg-orange text-dark text-capitalize">
         {{ fullname.charAt(0) }}
       </q-avatar>
     </q-item-section>
