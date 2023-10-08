@@ -1,7 +1,9 @@
 <template>
-  <q-layout view="lHh Lpr lff">
+  <q-layout view="lhr lpR lFr">
     <q-header bordered class="bg-orange text-dark">
       <q-toolbar>
+        <q-btn flat @click="leftDrawer = !leftDrawer" round dense icon="menu" />
+
         <q-toolbar-title>{{ pathName }}</q-toolbar-title>
         <q-btn
           flat
@@ -10,48 +12,39 @@
           no-caps
           @click="handleLogout"
         />
-        <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+        <q-btn
+          flat
+          @click="rightDrawer = !rightDrawer"
+          round
+          dense
+          icon="menu"
+        />
       </q-toolbar>
     </q-header>
 
-    <q-drawer bordered v-model="drawer" show-if-above>
-      <q-list padding style="margin-top: 150px">
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-
-      <q-img
-        class="absolute-top"
-        fit="fill"
-        :src="BgUser"
-        style="height: 150px"
-      >
+    <q-drawer bordered v-model="leftDrawer" show-if-above>
+      <q-img class="" fit="fill" :src="BgUser" style="height: 210px">
         <div class="absolute-bottom bg-transparent">
           <q-avatar
             size="56px"
-            class="q-mb-sm bg-orange text-dark text-capitalize"
+            class="q-mb-sm bg-orange text-dark text-capitalize text-bold"
           >
             {{ userStore.fullname.charAt(0) }}
           </q-avatar>
           <div
-            class="text-weight-bold text-capitalize text-left q-pl-sm"
-            style="width: 50%"
+            class="text-weight-bold text-capitalize text-left q-pl-sm column"
           >
-            {{ userStore.fullname }}
-            @{{ userStore.username }}
+            <span>{{ userStore.fullname }}</span>
+            <span>@{{ userStore.username }}</span>
           </div>
         </div>
       </q-img>
 
+      <span class="text-grey-9 text-h6 q-ml-md q-mt-xl">Inbox</span>
       <q-separator />
-
-      <span class="text-grey-7 q-ml-md q-mt-md">Inbox</span>
       <q-scroll-area
         class="column"
-        style="height: 50%; max-height: calc(100% - 200px)"
+        style="height: 50%; max-height: calc(100% - 210px)"
       >
         <q-list separator class="rounded-borders" style="max-width: 300px">
           <FriendListComponent
@@ -63,6 +56,36 @@
       </q-scroll-area>
     </q-drawer>
 
+    <q-drawer show-if-above v-model="rightDrawer" side="right" bordered>
+      <div class="column q-gutter-y-md">
+        <q-toolbar class="bg-orange text-dark shadow-2">
+          <q-toolbar-title>Available Users</q-toolbar-title>
+        </q-toolbar>
+
+        <q-virtual-scroll
+          v-if="contacts.length > 1"
+          :items="contacts"
+          style="height: 300px; max-height: calc(100% - 50px)"
+          v-slot="{ item, index }"
+        >
+          <q-list separator>
+            <AvailableUsersComponent
+              class="text-capitalize"
+              :key="index"
+              v-bind="item"
+            />
+          </q-list>
+        </q-virtual-scroll>
+
+        <div v-else class="column flex flex-center" style="height: 90vh">
+          <span class="text-grey-9 text-weight-bold"
+            >Oops!... I guess no one's online</span
+          >
+          <q-img src="src/assets/empty.png" width="60%" />
+        </div>
+      </div>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -71,8 +94,8 @@
 
 <script setup>
 import { defineComponent, onMounted, ref, watchEffect } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
-import FriendListComponent from "src/components/FriendList/FriendListChatComponent.vue";
+import FriendListComponent from "src/components/FriendListChatComponent.vue";
+import AvailableUsersComponent from "src/components/AvailableUsersComponent.vue";
 import { useRoute, useRouter } from "vue-router";
 import { socket } from "src/functions/socket.io";
 import { api } from "src/boot/axios";
@@ -98,28 +121,7 @@ const customSort = (a, b) => {
   }
 };
 
-const linksList = [
-  {
-    title: "Inbox",
-    caption: "messages inbox",
-    icon: "mdi-inbox-arrow-up",
-    link: "/home",
-  },
-  {
-    title: "Sent",
-    caption: "messages sent",
-    icon: "mdi-send-check",
-    link: "/sent",
-  },
-  {
-    title: "Friends ",
-    caption: "People that are your friends",
-    icon: "mdi-account-multiple-outline",
-    link: "/discover",
-  },
-];
-
-const msgData = [
+const msgData = ref([
   {
     user_id: 1,
     fullname: "John Doe",
@@ -155,14 +157,16 @@ const msgData = [
     datesend: "2023-09-15 10:45:00",
     msgstatus: "read",
   },
-];
+]);
 
-msgData.sort(customSort);
+const contacts = ref([]);
+
+msgData.value.sort(customSort);
 
 const router = useRouter();
-const drawer = ref(false);
+const leftDrawer = ref(false);
+const rightDrawer = ref(false);
 const messageData = msgData;
-const essentialLinks = linksList;
 const pathName = ref("");
 const userStore = useUserStore();
 const decoded = jwt_decode(SessionStorage.getItem("token"));
@@ -180,9 +184,7 @@ const handleLogout = async () => {
     );
 
     if (response.data.status_code === 200) {
-      socket.on("disconnect", () => {
-        console.log("Disconnected");
-      });
+      socket.emit("user_logout", decoded.user_id);
       SessionStorage.clear();
       userStore.clearUser();
       router.push("/login");
@@ -208,7 +210,6 @@ const getUserData = async () => {
 
     userStore.initUser(response.data);
   } catch (error) {
-    console.error(error);
     throw new Error(error);
   }
 };
@@ -216,6 +217,17 @@ const getUserData = async () => {
 onMounted(() => {
   socket.on("connect", () => {
     console.info("you are connected!");
+  });
+
+  socket.emit("user_connected", {
+    user_id: decoded.user_id,
+    fullname: decoded.fullname,
+    username: decoded.username,
+    user_status: "online",
+  });
+
+  socket.on("user_connected", (user_data) => {
+    contacts.value = user_data;
   });
 
   getUserData();

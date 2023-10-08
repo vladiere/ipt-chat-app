@@ -3,27 +3,26 @@ import { SessionStorage } from "quasar";
 const routes = [
   {
     path: "/",
-    component: () => import("layouts/MainLayout.vue"),
+    // component: () => import("layouts/MainLayout.vue"),
+    component: () => import("layouts/ConversationLayout.vue"),
     children: [
-      {
-        path: "",
-        name: "Home",
-        component: () => import("pages/NoConversation.vue"),
-      },
       {
         path: "/t/:id",
         name: "Chat Room",
-        component: () => import("components/ChatRoomComponent.vue"),
+        component: () => import("pages/ChatRoomPage.vue"),
       },
       {
-        path: "/discover",
-        name: "Search and discover new people",
-        component: () => import("pages/DiscoverNewPeople.vue"),
+        path: "",
+        name: "Home",
+        component: () => import("pages/NoConversationPage.vue"),
       },
     ],
     beforeEnter: (to, from, next) => {
       // Check if there is a token in the session storage
-      if (!SessionStorage.getItem("token")) {
+      if (
+        !SessionStorage.getItem("token") ||
+        SessionStorage.getItem("token") == undefined
+      ) {
         next("/login");
       } else {
         next();

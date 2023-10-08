@@ -15,6 +15,8 @@
           <q-input
             label="Lastname"
             v-model="form.lastname"
+            color="orange"
+            label-color="dark"
             outlined
             class="col"
             :rules="[
@@ -24,6 +26,8 @@
           <q-input
             label="Firstname"
             v-model="form.firstname"
+            color="orange"
+            label-color="dark"
             outlined
             class="col"
             :rules="[
@@ -35,6 +39,8 @@
           <q-input
             label="Username"
             v-model="form.username"
+            color="orange"
+            label-color="dark"
             outlined
             :rules="[
               (val) =>
@@ -45,6 +51,8 @@
             label="Password"
             outlined
             v-model="form.password"
+            color="orange"
+            label-color="dark"
             :type="isPwd ? 'password' : 'text'"
             :rules="[
               (val) => (val && val.length > 0) || 'Please enter your password',
@@ -64,18 +72,18 @@
             flat
             label="Back to Login"
             no-caps
-            color="blue-10"
+            color="dark"
             class="self-center"
             icon="mdi-arrow-left"
             rounded
             to="/"
           />
           <q-btn
-            color="purple-13"
+            color="orange"
+            text-color="dark"
             label="Register"
             type="submit"
             class="self-center"
-            rounded
           />
         </div>
       </q-form>
@@ -85,7 +93,7 @@
 
 <script setup>
 import { defineComponent, ref } from "vue";
-import { api } from "src/boot/axios";
+import { jwtApi } from "src/boot/axios";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 
@@ -106,7 +114,7 @@ const form = ref({
 
 const handleRegister = async () => {
   try {
-    await api.post("/user/register", { form: form.value });
+    await jwtApi.post("/user/register", { form: form.value });
     ifSuccess.value = true;
 
     $q.notify({

@@ -10,12 +10,13 @@
               style="width: 10%"
             />
             <div class="row text-h3 text-bold">
-              <span class="text-dark">Amici</span>
-              <span class="bg-orange text-dark q-px-md">Viestintä</span>
+              <span class="text-dark">Chat</span>
+              <span class="bg-orange text-dark q-px-sm rounded-borders"
+                >Hub</span
+              >
             </div>
             <div class="text-h5 text-grey-10">
-              "Unlock Connections, Embrace Friendship - Welcome to Amici
-              Viestintä!
+              "Unlock Connections, Embrace Friendship"
             </div>
           </div>
         </div>
@@ -77,7 +78,7 @@
 <script setup>
 import { defineComponent, ref } from "vue";
 import { jwtApi } from "src/boot/axios";
-import { SessionStorage } from "quasar";
+import { SessionStorage, Notify } from "quasar";
 import { useRouter } from "vue-router";
 
 defineComponent({
@@ -97,11 +98,20 @@ const handleLogin = async () => {
   try {
     const response = await jwtApi.post("/user/login", { form: form.value });
 
-    SessionStorage.set("token", response.data.accessToken);
-    SessionStorage.set("refresh", response.data.refreshToken);
+    if (response.data.status_code) {
+      Notify.create({
+        message: response.data.message,
+        type: "negative",
+        position: "top-right",
+        timeout: 2300,
+      });
+    } else {
+      SessionStorage.set("token", response.data.accessToken);
+      SessionStorage.set("refresh", response.data.refreshToken);
 
-    loading.value = true;
-    router.push("/");
+      loading.value = true;
+      router.push("/");
+    }
   } catch (error) {
     throw new Error(error);
   }

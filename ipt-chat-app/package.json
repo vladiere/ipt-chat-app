@@ -1,8 +1,8 @@
 {
   "name": "ipt-chat-app",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "IPT Chat application",
+  "description": "ChatHub an IPT Chat application project",
+  "productName": "ChatHub",
   "author": "vladiere <ruthakaza@gmail.com>",
   "private": true,
   "scripts": {

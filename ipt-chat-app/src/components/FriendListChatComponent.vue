@@ -4,6 +4,9 @@
       <q-avatar size="3em" class="q-mb-sm bg-orange text-dark text-capitalize">
         {{ fullname.charAt(0) }}
       </q-avatar>
+      <div class="absolute-top">
+        <div class="bg-green" style="width: 50px; border-radius: 50%"></div>
+      </div>
     </q-item-section>
 
     <q-item-section>
@@ -50,13 +53,6 @@ const formatTimeAgo = (datesend) => {
   }
 };
 
-const generateSalt = () => {
-  const randomNumber = Math.floor(Math.random() * 1000000000);
-  const formattedNumber = randomNumber.toString().padStart(10, "0");
-
-  return formattedNumber;
-};
-
 const { user_id, fullname, message, datesend, msgstatus } = defineProps([
   "user_id",
   "fullname",
@@ -66,7 +62,9 @@ const { user_id, fullname, message, datesend, msgstatus } = defineProps([
 ]);
 
 const convertsationFunction = (userid) => {
-  const saltingUserId = generateSalt() + userid;
+  const randomNumber = Math.floor(Math.random() * 1000000000);
+
+  const saltingUserId = randomNumber.toString() + userid;
   router.replace({ name: "Chat Room", params: { id: saltingUserId } });
 };
 </script>

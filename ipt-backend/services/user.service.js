@@ -29,8 +29,8 @@ const login = async (user_data) => {
         const connection = await Connect();
         const user = await Query(connection, query);
 
-        if (user.status === '404') {
-            return { message: 'Username not registered'};
+        if (user.length == 0) {
+            return { message: 'Username not registered', status_code: 404 };
         }
 
         const result = await new Promise((resolve, reject) => {
@@ -55,17 +55,16 @@ const login = async (user_data) => {
                 } else {
                     reject({
                         message: 'Login failed wrong password',
-                        statud: 500
+                        status_code: 404
                     });
                 }
 
             });
         });
-
+        
         return result;
     } catch (error) {
-        console.error(error);
-        return { error: error.message };
+        return { message: error.message, status_code: 404 };
     }
 }
 
