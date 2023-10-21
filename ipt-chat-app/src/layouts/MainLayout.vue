@@ -100,6 +100,7 @@ import { useRoute, useRouter } from "vue-router";
 import { socket } from "src/functions/socket.io";
 import { api } from "src/boot/axios";
 import { useUserStore } from "stores/user.store";
+import { useMessageStore } from "src/stores/msg-store";
 import { SessionStorage } from "quasar";
 import BgUser from "src/assets/chathub.png";
 import jwt_decode from "jwt-decode";
@@ -109,6 +110,15 @@ defineComponent({
 });
 
 const route = useRoute();
+const router = useRouter();
+const leftDrawer = ref(false);
+const rightDrawer = ref(false);
+const messageData = msgData;
+const pathName = ref("");
+const userStore = useUserStore();
+const msgStore = useMessageStore();
+const decoded = jwt_decode(SessionStorage.getItem("token"));
+const contacts = ref([]);
 
 const customSort = (a, b) => {
   if (a.msgstatus === "unread" && b.msgstatus === "read") {
@@ -159,17 +169,9 @@ const msgData = ref([
   },
 ]);
 
-const contacts = ref([]);
 
 msgData.value.sort(customSort);
 
-const router = useRouter();
-const leftDrawer = ref(false);
-const rightDrawer = ref(false);
-const messageData = msgData;
-const pathName = ref("");
-const userStore = useUserStore();
-const decoded = jwt_decode(SessionStorage.getItem("token"));
 
 const handleLogout = async () => {
   try {
