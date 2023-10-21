@@ -1,17 +1,26 @@
 <template>
-  <div class="column relative-position">
+  <div
+    class="absolute-center"
+    v-if="loading"
+  >
+    <q-spinner-ios
+      color="orange"
+      size="5.5em"
+    />
+  </div>
+  <div v-else class="column relative-position">
     <div
-      class="row q-pa-sm bg-grey-3 items-center q-gutter-x-md shadow-2 text-capitalize"
+      class="row q-pa-sm bg-grey-1 items-center q-gutter-x-md shadow-2 text-capitalize"
     >
       <q-avatar
         avatar
         size="3em"
         class="bg-orange text-dark text-uppercase text-bold"
       >
-        {{ props.fullname.charAt(0) }}
+      {{ userFullname }}
       </q-avatar>
       <span class="text-bold">
-        {{ props.fullname }}
+        {{ userData.fullname }}
       </span>
     </div>
     <q-virtual-scroll
@@ -28,7 +37,7 @@
     >
       <q-chat-message
         :key="index"
-        :sent="props.socket_id !== item.to"
+        :sent="userQuery[0] !== item.to"
         :bg-color="decoded.user_id !== item.user_id ? 'orange' : 'grey-5'"
         :avatar="avatarFace"
         :stamp="formatTimeAgo(item.stamp)"
@@ -36,63 +45,6 @@
         <div>{{ item.messages }}</div>
       </q-chat-message>
     </q-virtual-scroll>
-    <div
-      v-else
-      class="column flex flex-center"
-      style="height: calc(100vh - 112px)"
-    >
-      <span class="text-grey-9 text-weight-bold text-h6"
-        >Start a convertsation now.</span
-      >
-    </div>
-    <div class="absolute-bottom q-px-sm bg-grey-2">
-      <q-input
-        placeholder="Type your messages..."
-        v-model="myMessage"
-        outlined
-        square
-        dense
-        flat
-        @keyup.enter="sendMessage"
-        class="col"
-      >
-        <template v-slot:after>
-          <q-btn
-            class="col"
-            icon="mdi-send"
-            color="blue"
-            rounded
-            flat
-            padding="6px"
-            size="md"
-          >
-            <q-tooltip
-              class="bg-grey-9 text-grey-1"
-              anchor="top left"
-              self="top left"
-              >Send</q-tooltip
-            >
-          </q-btn>
-          <q-btn
-            class="col"
-            icon="mdi-paperclip"
-            color="grey-3"
-            text-color="grey-10"
-            rounded
-            flat
-            padding="6px"
-            size="md"
-          >
-            <q-tooltip
-              class="bg-grey-9 text-grey-1"
-              anchor="top left"
-              self="top left"
-              >Add image</q-tooltip
-            >
-          </q-btn>
-        </template>
-      </q-input>
-    </div>
   </div>
 </template>
 
@@ -103,6 +55,7 @@ import { socket } from "src/functions/socket.io";
 import jwt_decode from "jwt-decode";
 import { SessionStorage } from "quasar";
 import { useRouter } from "vue-router";
+import { api } from 'src/boot/axios.js';
 
 defineComponent({
   name: "ChatRoomComponent",
@@ -112,7 +65,10 @@ const messages = ref([]);
 const myMessage = ref("");
 const decoded = jwt_decode(SessionStorage.getItem("token"));
 const router = useRouter();
-const props = ref([]);
+const userData = ref([]);
+const userFullname = ref('')
+const loading = ref(true);
+const userQuery = ref([])
 const currentUserId = ref(null);
 
 function getCurrentDateTime() {
@@ -167,20 +123,42 @@ const sendMessage = async () => {
   }
 };
 
+const getUserData = async () => {
+  try {
+   const response = await api.post(
+      '/user/get/all',
+      { user_id: userQuery.value[1] },
+      {
+        headers: {
+          Authorization: `Bearer ${
+            SessionStorage.getItem('token')
+          }`,
+        },
+      }
+    );
+    console.log(response.data);
+    userData.value = response.data;
+    userFullname.value = userData.value.fullname.charAt(0)
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 onMounted(async () => {
+
+  userQuery.value = router.currentRoute.value.params.id.split('_');
+  currentUserId.value = userQuery.value[1];
+
+  setTimeout(() => {
+    loading.value = false
+    getUserData();
+  }, 1200);
+
   socket.on("received_message", (data) => {
     messages.value.push(data);
   });
 
-  props.value = JSON.parse(router.currentRoute.value.params.id);
-  currentUserId.value = props.value.user_id;
 });
 
-watchEffect(() => {
-  props.value = JSON.parse(router.currentRoute.value.params.id);
 
-  if (currentUserId.value !== props.value.user_id) {
-    messages.value = [];
-  }
-});
 </script>

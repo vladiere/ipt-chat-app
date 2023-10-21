@@ -46,7 +46,7 @@ const handleClickToChat = (user_data) => {
 
   router.replace({
     name: "Chat Room",
-    params: { id: JSON.stringify(userData) },
+    params: { id: userData.socket_id + '_' + userData.user_id },
   });
 };
 </script>

@@ -1,17 +1,5 @@
 <template>
   <q-layout view="lHr lpR lFr">
-    <q-header elevated class="bg-orange text-dark">
-      <q-toolbar>
-        <q-toolbar-title>
-          <q-avatar
-            size="50px"
-            class="bg-dark text-white text-uppercase text-bold q-my-sm q-mr-sm"
-            >L</q-avatar
-          >Lance Phillip
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-header>
-
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
       <q-img
         class=""
@@ -29,10 +17,11 @@
           @input="handleSearchUser"
           rounded
           bg-color="white"
+          @blur="onBlur"
         >
           <template v-slot:append>
-            <q-icon name="mdi-magnify" />
-          </template>
+            <q-icon :name="searchQuery ? 'mdi-close-circle-outline' : 'mdi-magnify'" @click.stop.prevent="searchQuery = null" class="cursor-pointer" />
+        </template>
         </q-input>
       </div>
       <q-separator />
@@ -51,11 +40,18 @@
           />
         </q-list>
         <q-list v-else separator style="max-width: 300px">
-          <AvailableUsersComponent
-            v-for="contact in filteredUsers"
-            :key="contact.user_id"
-            v-bind="contact"
-          />
+          <div v-if="filteredUsers.length === 0" class="column text-center q-mt-md">
+            <q-item-label caption>
+              No user found
+            </q-item-label>
+          </div>
+          <div v-else>
+            <AvailableUsersComponent
+              v-for="contact in filteredUsers"
+              :key="contact.user_id"
+              v-bind="contact"
+            />
+          </div>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -138,10 +134,19 @@
         v-model="myMessage"
       >
         <template v-slot:before>
-          <q-btn icon="mdi-emoticon-outline" round flat />
+          <q-btn icon="mdi-emoticon-outline" round flat >
+            <q-tooltip class="bg-grey-9 text-grey-2" :delay="300">
+              emojis
+            </q-tooltip>
+          </q-btn>
+
         </template>
         <template v-slot:after>
-          <q-btn icon="mdi-paperclip" round flat />
+          <q-btn icon="mdi-paperclip" round flat >
+            <q-tooltip class="bg-grey-9 text-grey-2" :delay="300">
+              Send image
+            </q-tooltip>
+          </q-btn>
         </template>
       </q-input>
     </q-footer>
@@ -246,6 +251,12 @@ const handleLogout = async () => {
     throw new Error(error);
   }
 };
+
+const onBlur = () => {
+  setTimeout(() => {
+    searchQuery.value = null;
+  }, 400);
+}
 
 onMounted(() => {
   socket.on("connect", () => {
