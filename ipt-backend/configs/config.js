@@ -1,6 +1,7 @@
 const MYSQL_HOST = 'localhost';
 const MYSQL_USER = 'root';
-const MYSQL_PASS = '31N$t31n';
+// const MYSQL_PASS = '31N$t31n';
+const MYSQL_PASS = '';
 const MYSQL_DATABASE = 'iptchatapp';
 
 const TOKEN_EXPIRETIME = '15m';
