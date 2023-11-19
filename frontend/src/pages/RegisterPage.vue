@@ -52,7 +52,7 @@ img
         <q-input
           dense
           lazy-rules
-          :type="isPwd ? 'password' : 'text'"
+          :type="!isPwd ? 'password' : 'text'"
           :rules="[
             val => val && val.length > 0 || 'Enter your password'
           ]"
@@ -87,8 +87,8 @@ img
 <script setup lang="ts">
 import { defineComponent, ref } from 'vue'
 import Logo from 'src/assets/logo.png';
-import { api } from 'boot/axios';
-import SpinnerTail from 'src/utils/loading';
+import { baseApi } from 'boot/axios';
+import { SpinnerTail } from 'src/utils/loading';
 import { useRouter } from 'vue-router';
 
 defineComponent({
@@ -106,10 +106,13 @@ const router = useRouter();
 
 const handleRegister = async () => {
   try {
-    const response = await api.post('/api/register', { form: form.value });
+    const response = await baseApi.post('/register', { form: form.value });
     if (response.status === 200) {
-      SpinnerTail(3000, 'Redirecting to Login please wait...');
-      router.push('/auth/login');
+      SpinnerTail(true, 'Redirecting to Login please wait...');
+      setTimeout(() => {
+        SpinnerTail(false);
+        router.push('/auth/login');
+      }, 3000);
     } else {
       console.error(response);
     }

@@ -27,8 +27,8 @@ app.use((req, res, next) => {
 })
 
 
-app.use('/api/user/', userRoute);
-app.use('/api/user/', refreshROuter);
+app.use('/api/', userRoute);
+app.use('/api/', refreshROuter);
 
 app.use((req, res, next) => {
     const error = new Error('Not Found');

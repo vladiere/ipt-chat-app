@@ -5,7 +5,7 @@
 </style>
 
 <template>
-  <div class="column q-pa-md">
+  <div class="column q-pa-md shadow-3">
     <div class="row justify-between items-center" >
       <span class="text-h6 text-primary">Pictures sent</span>
       <q-btn

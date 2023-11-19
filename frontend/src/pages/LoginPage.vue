@@ -27,7 +27,7 @@ img
         <q-input
           dense
           lazy-rules
-          :type="isPwd ? 'password' : 'text'"
+          :type="!isPwd ? 'password' : 'text'"
           :rules="[
             val => val && val.length > 0 || 'Enter your password'
           ]"
@@ -62,6 +62,10 @@ img
 <script setup lang="ts">
 import { defineComponent, ref } from 'vue'
 import Logo from 'src/assets/logo.png';
+import { SpinnerTail } from 'src/utils/loading';
+import { baseApi } from 'boot/axios';
+import { useUserStore } from 'stores/user-store';
+import { useRouter } from 'vue-router';
 
 defineComponent({
   name: 'LoginPage'
@@ -72,10 +76,19 @@ const form = ref({
   password: ''
 });
 const isPwd = ref(false);
+const userStore = useUserStore();
+const router = useRouter()
+
 
 const handleLogin = async () => {
   try {
-    console.log(form.value);
+    const response = await baseApi.post('/login', { form: form.value });
+    userStore.initTokens(response.data);
+    SpinnerTail(true, 'Redirecting to homepage please wait...');
+    setTimeout(() => {
+      SpinnerTail(false);
+      router.push('/');
+    }, 3000);
   } catch (error) {
     throw error;
   }
