@@ -15,13 +15,13 @@ Integrative Programming and Technologies Chat Application group project with soc
 ### Frontend dependencies installation
 
 ```bash
-cd ipt-chat-app
+cd frontend
 npm install
 quasar dev
 ```
 ## Backend dependencies installation
 ```bash
-cd ipt-backend
+cd backend
 npm install
 npm run dev
 ```
