@@ -7,7 +7,7 @@ const userRoute = require('./routers/user.route');
 const refreshROuter = require('./routers/refresh.route')
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const http = require('http').createServer(app);
 
 app.use(express.json());
@@ -26,7 +26,9 @@ app.use((req, res, next) => {
     next();
 })
 
-
+app.get('/', (req, res) => {
+  return res.status(200).json({ success: 'OK' });
+})
 app.use('/api/', userRoute);
 app.use('/api/', refreshROuter);
 
