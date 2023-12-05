@@ -72,7 +72,7 @@ const login = async (email, password) => {
   }
 }
 
-module.export = {
+module.exports = {
   register,
   login,
 }

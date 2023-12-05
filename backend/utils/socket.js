@@ -11,3 +11,5 @@ const initializeSocket = (server) => {
     console.info('User connection socket ID: ', socket.id);
   });
 }
+
+module.exports = { initializeSocket };
