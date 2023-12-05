@@ -14,16 +14,19 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'http://localhost:8080/api' });
-const baseApi = axios.create({ baseURL: 'http://localhost:8080/api' });
+// const api = axios.create({ baseURL: 'http://localhost:8080/api' });
+// const baseApi = axios.create({ baseURL: 'http://localhost:8080/api' });
+
+const api = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
+const baseApi = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
 
 const refreshToken = async () => {
   try {
-    const response = await api.post("/user/refresh/token", {
+    const response = await api.post('/auth/refresh/token', {
       refreshToken: SessionStorage.getItem("refresh"),
     });
 
-    return response.data[0];
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -31,21 +34,37 @@ const refreshToken = async () => {
 
 api.interceptors.request.use(
   async (config) => {
-    const currentDate = new Date();
-
-    const decoded = jwt_decoded(SessionStorage.getItem("token"));
-    if (decoded.exp * 1000 < currentDate.getTime()) {
-      const data = await refreshToken();
-
-      config.headers["Authorization"] = `Bearer ${data.accessToken}`;
+    if (!config.headers['Authorization']) {
+      config.header['Authorization'] = `Bearer ${SessionStorage.getItem('token')}`
     }
-
     return config;
   },
-  (error) => {
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  response => response,
+  async (error) => {
+    const prevRequest = error?.config;
+
+    if(error?.response.status === 401 && !prevRequest?.sent) {
+      prevRequest.sent = true;
+
+      const token = await refreshToken();
+
+      if (token) {
+        prevRequest.headers['Authorization'] = `Bearer ${token.accessToken}`
+
+        SessionStorage.set('token', token.accessToken);
+        return api(prevRequest);
+      } else {
+        return Promise.reject(error);
+      }
+    }
+
     return Promise.reject(error);
   }
-);
+)
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
