@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../configs/config');
-const { Connect, Query } = require('../configs/mysql.config');
+const RefreshToken = require('../models/refreshtoken');
 
 const refreshUserTokens = async (req, res) => {
     const { refreshToken } = req.body;
@@ -9,15 +9,13 @@ const refreshUserTokens = async (req, res) => {
         logger.warn("Unauthorized: No Token Provided");
         return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
-    const query = `SELECT COUNT(*) AS found_one FROM refresh_token WHERE refresh_token = '${refreshToken}' LIMIT 1;`;
+    const query = await RefreshToken.findOne({ where: { refresh: refreshToken }});
 
-    const connection = await Connect();
-    const resultQuery = await Query(connection, query);
     
-    if (resultQuery[0].found_one === 0) {
+    if (query === null) {
         return res.status(404).json({
             message: 'Refresh token is not valid'
-        })
+        });
     }
 
 
@@ -29,7 +27,7 @@ const refreshUserTokens = async (req, res) => {
         
             // Create the access token
             jwt.sign(
-                { username: decoded.username, user_id: decoded.user_id, privilege: decoded.privilege },
+                { email: decoded.email, uuid: decoded.uuid },
                 config.token.accessSecret,
                 {
                     issuer: config.token.issuer,
@@ -43,7 +41,7 @@ const refreshUserTokens = async (req, res) => {
                     } else if (accessToken) {
                         // Create the refresh token
                         jwt.sign(
-                            { username: decoded.username, user_id: decoded.user_id, privilege: decoded.privilege },
+                            { email: decoded.email, uuid: decoded.uuid },
                                 config.token.refreshSecret,
                             {
                                 issuer: config.token.issuer,
@@ -55,10 +53,7 @@ const refreshUserTokens = async (req, res) => {
                                 return res.status(500).json(error);
                                 } else if (refreshToken) {
                                     // Insert the refresh token into the database
-                                    const query = `INSERT INTO refresh_token (refresh_token, username) VALUE('${refreshToken}','${decoded.username}')`
-                                    const connection = await Connect();
-
-                                    await Query(connection, query);
+                                    await RefreshToken.create({ decoded.uuid, refreshToken });
                                     
                                     return res.status(201).json({
                                         accessToken,

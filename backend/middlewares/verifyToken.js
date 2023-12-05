@@ -6,11 +6,11 @@ const verifyToken = async (req, res, next) => {
 
     if (!authHeader) {
         console.warn('Unauthorize: No token provided');
-        return res.status(500).json({ message: 'Unauthorize: No token provided'});
+        return res.status(401).json({ message: 'Unauthorize: No token provided'});
     }
 
     if (!authHeader.startsWith('Bearer ')) {
-        return res.status(500).json({ message: 'Invalid TOKEN'});
+        return res.status(401).json({ message: 'Invalid TOKEN'});
     }
 
     const token = authHeader.slice(7);
@@ -18,7 +18,7 @@ const verifyToken = async (req, res, next) => {
     jwt.verify(token, config.token.accessSecret, (err, decoded) => {
         if (err) {
             console.error('Something is wrong in verifying TOKEN', err);
-            return res.status(500).json({ message: 'Unauthorize: Invalid TOKEN'});
+            return res.status(401).json({ message: 'Unauthorize: Invalid TOKEN'});
         }
 
         req.body.user = decoded.user; // Attach the data to the request for late use

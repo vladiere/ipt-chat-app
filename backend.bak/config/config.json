@@ -1,0 +1,30 @@
+{
+  "development": {
+    "username": "fl0user",
+    "password": "ipycfkv3HI5h",
+    "database": "iptchatapp",
+    "host": "ep-wild-moon-47298126.ap-southeast-1.aws.neon.fl0.io",
+    "dialect": "postgres",
+    "ssl": true,
+    "dialecOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
