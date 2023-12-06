@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('../configs/config');
+const config = require('../config/config.js');
 const RefreshToken = require('../models/refreshtoken');
 
 const refreshUserTokens = async (req, res) => {
@@ -53,7 +53,7 @@ const refreshUserTokens = async (req, res) => {
                                 return res.status(500).json(error);
                                 } else if (refreshToken) {
                                     // Insert the refresh token into the database
-                                    await RefreshToken.create({ decoded.uuid, refreshToken });
+                                    await RefreshToken.create({ user_id: decoded.uuid, refresh: refreshToken });
                                     
                                     return res.status(201).json({
                                         accessToken,
@@ -68,4 +68,4 @@ const refreshUserTokens = async (req, res) => {
     });
 };
 
-module.exports = refreshUserTokens;
+module.exports = { refreshUserTokens };

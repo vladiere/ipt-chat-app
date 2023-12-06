@@ -9,6 +9,8 @@ const initializeSocket = (server) => {
 
   io.on('connection', () => {
     console.info('User connection socket ID: ', socket.id);
+
+    socket.on('')
   });
 }
 
