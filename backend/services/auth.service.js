@@ -4,7 +4,7 @@ const signJWT = require('../utils/signJWT');
 
 const register = async (firstname, lastname, email, password ) => {
   try {
-    const hash = await bcryptjs.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
     const result = await User.create({ firstname, lastname, email, hash });
 
     if (result) {
