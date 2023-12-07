@@ -11,9 +11,6 @@ const PORT = process.env.PORT || 4300;
 const http = require('http').createServer(app);
 const allowedOrigins = ['http://localhost:9000'];
 
-app.use(express.json());
-app.use(bodyParser.json());
-
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -23,6 +20,12 @@ const corsOptions = {
     }
   }
 }
+
+app.use(express.json());
+app.use(bodyParser.json());
+
+
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
   return res.status(200).json({ message: 'OK' });
