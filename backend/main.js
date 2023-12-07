@@ -13,7 +13,7 @@ const http = require('http').createServer(app);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors({
-  origin: "http://localhost:9000"
+  origin: "*"
 }));
 
 app.get('/', (req, res) => {
