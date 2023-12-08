@@ -17,9 +17,13 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     initTokens (tokens: object) {
+      console.log(tokens)
       this.token = tokens.accessToken;
       this.access = tokens.refreshToken;
       this.authenticated = true;
+    },
+    changeToken (token: string) {
+      this.token = token;
     },
     clearToken () {
       this.token = '';
@@ -31,6 +35,10 @@ export const useUserStore = defineStore('user', {
     },
     clearUser () {
       this.user = [];
+    },
+    logout () {
+      this.clearUser();
+      this.clearToken();
     }
   },
   persist: {

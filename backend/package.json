@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "backend for the project IPT chat app",
   "main": "main.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon main.js"
@@ -18,7 +17,7 @@
     "url": "https://github.com/vladiere/ipt-chat-app/issues"
   },
   "homepage": "https://github.com/vladiere/ipt-chat-app#readme",
-    "dependencies": {
+  "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",

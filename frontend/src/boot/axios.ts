@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
+import { useUserStore } from 'stores/user-store';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -7,6 +8,8 @@ declare module '@vue/runtime-core' {
     $api: AxiosInstance;
   }
 }
+
+const userStore = useUserStore();
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -17,14 +20,18 @@ declare module '@vue/runtime-core' {
 // const api = axios.create({ baseURL: 'http://localhost:8080/api' });
 // const baseApi = axios.create({ baseURL: 'http://localhost:8080/api' });
 
-const api = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
-const baseApi = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
+// const api = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
+// const baseApi = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
+//
+const api = axios.create({ baseURL: 'http://localhost:8080/api/' });
+const baseApi = axios.create({ baseURL: 'http://localhost:8080/api/' });
 
 const refreshToken = async () => {
   try {
-    const response = await api.post('/auth/refresh/token', {
-      refreshToken: SessionStorage.getItem("refresh"),
+    const response = await api.post('/auth/refresh', {
+      refreshToken: userStore.access,
     });
+    console.log(response)
 
     return response.data;
   } catch (error) {
@@ -35,7 +42,7 @@ const refreshToken = async () => {
 api.interceptors.request.use(
   async (config) => {
     if (!config.headers['Authorization']) {
-      config.header['Authorization'] = `Bearer ${SessionStorage.getItem('token')}`
+      config.headers['Authorization'] = `Bearer ${userStore.token}`
     }
     return config;
   },
@@ -46,16 +53,18 @@ api.interceptors.response.use(
   response => response,
   async (error) => {
     const prevRequest = error?.config;
+    console.log(error)
 
     if(error?.response.status === 401 && !prevRequest?.sent) {
       prevRequest.sent = true;
 
       const token = await refreshToken();
+      console.log(token)
 
       if (token) {
         prevRequest.headers['Authorization'] = `Bearer ${token.accessToken}`
 
-        SessionStorage.set('token', token.accessToken);
+        userStore.changeToken(token.accessToken);
         return api(prevRequest);
       } else {
         return Promise.reject(error);

@@ -39,14 +39,16 @@ img
           </div>
 
         </div>
-        <span class="text-subtitle1 text-weight-light text-primary">Username</span>
+        <span class="text-subtitle1 text-weight-light text-primary">Email Address</span>
         <q-input
           dense
+          type="email"
           lazy-rules
           :rules="[
-            val => val && val.length > 0 || 'Enter your username'
+            val => val && val.length > 0 || 'Enter your email address *',
+            val => emailRegex.test(val) || 'Invalid email address'
           ]"
-          v-model="form.username"
+          v-model="form.email"
         />
         <span class="text-subtitle1 text-weight-light text-primary q-mt-sm">Password</span>
         <q-input
@@ -54,7 +56,8 @@ img
           lazy-rules
           :type="!isPwd ? 'password' : 'text'"
           :rules="[
-            val => val && val.length > 0 || 'Enter your password'
+            val => val && val.length > 0 || 'Enter your password *',
+            val => val.length > 6 || 'Password must be at least 6 characters'
           ]"
           v-model="form.password"
         >
@@ -90,6 +93,7 @@ import Logo from 'src/assets/logo.png';
 import { baseApi } from 'boot/axios';
 import { SpinnerTail } from 'src/utils/loading';
 import { useRouter } from 'vue-router';
+import { debounce } from 'quasar';
 
 defineComponent({
   name: 'LoginPage'
@@ -98,15 +102,16 @@ defineComponent({
 const form = ref({
   firstname: '',
   lastname: '',
-  username: '',
+  email: '',
   password: ''
 });
 const isPwd = ref(false);
 const router = useRouter();
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-const handleRegister = async () => {
+const sendForm = debounce(async () => {
   try {
-    const response = await baseApi.post('/register', { form: form.value });
+    const response = await baseApi.post('/auth/register', { firstname: form.value.firstname, lastname: form.value.lastname, email: form.value.email, password: form.value.password });
     if (response.status === 200) {
       SpinnerTail(true, 'Redirecting to Login please wait...');
       setTimeout(() => {
@@ -116,6 +121,17 @@ const handleRegister = async () => {
     } else {
       console.error(response);
     }
+  } catch (error) {
+    throw error;
+  } finally {
+    SpinnerTail(false);
+  }
+}, 1500)
+
+const handleRegister = async () => {
+  try {
+    SpinnerTail(true, 'Checking...');
+    await sendForm();
   } catch (error) {
     throw error;
   }

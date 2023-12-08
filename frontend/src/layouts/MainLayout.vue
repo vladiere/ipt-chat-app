@@ -20,17 +20,21 @@
 
           <q-item-section side top>
             <q-btn-dropdown color="grey-9" flat dense dropdown-icon="mdi-chevron-down">
-              <q-list>
-                <q-item clickable v-close-popup @click="onItemClick">
-                  <q-item-section>
-                    <q-item-label>Profile</q-item-label>
+              <q-list dense>
+                <q-item clickable v-close-popup @click="onItemClick('profile')">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-account" />
                   </q-item-section>
+
+                  <q-item-section> Profile </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="onItemClick">
-                  <q-item-section>
-                    <q-item-label>Logout</q-item-label>
+                <q-item clickable v-close-popup @click="onItemClick('logout')">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-logout" />
                   </q-item-section>
+
+                  <q-item-section> Logout </q-item-section>
                 </q-item>
               </q-list>
             </q-btn-dropdown>
@@ -51,8 +55,6 @@
       :breakpoint="500"
       class="bg-blue-1"
     >
-        <!-- <q-btn flat size="lg" to="/" dense padding="0px" icon="mdi-message-text" text-color="primary" /> -->
-        <!-- <q-btn flat size="lg" padding="0px" icon="mdi-cog-outline" text-color="primary" /> -->
         <q-list padding class="q-mt-lg">
             <q-item clickable v-ripple to="/">
               <q-item-section avatar>
@@ -79,14 +81,44 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useUserStore } from 'stores/user-store';
+import { useRouter } from 'vue-router';
+import { debounce } from 'quasar';
+import { SpinnerTail } from 'src/utils/loading';
+import userDetails from 'src/utils/getUser';
 
-  const miniState = ref(true);
-  const leftDrawerOpen = ref(false);
-  const toggleLeftDrawer = () => {
-    leftDrawerOpen.value = !leftDrawerOpen.value;
+const miniState = ref(true);
+const router = useRouter();
+const userStore = useUserStore();
+const leftDrawerOpen = ref(false);
+
+const toggleLeftDrawer = () => {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+}
+
+const handleLogoutUser = debounce(async() => {
+  try {
+    userStore.logout();
+    router.push('/auth/login')
+  } catch (error) {
+    throw error;
+  } finally {
+    SpinnerTail(false);
   }
-  const onItemClick = () => {
-    console.log('clicked')
+}, 1500);
+
+const onItemClick = async (options: string) => {
+  console.log(options)
+  if (options === 'logout') {
+    SpinnerTail(true,'Logging out');
+    await handleLogoutUser();
+  } else {
+    router.push({ name: options });
   }
+}
+
+onMounted(async () => {
+  await userDetails.getUserDetails();
+})
 </script>

@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('users_table', {
+    await queryInterface.createTable('user_messages_table', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,30 +11,36 @@ module.exports = {
       },
       uuid: {
         type: DataTypes.UUID,
+        allowNull: false,
         defaultValue: DataTypes.UUIDV4
       },
-      firstname: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
       },
-      lastname: {
+      uuid_to: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
         validate: {
-          isEmail: true 
+          isNull: { msg: 'User to is required' },
         }
       },
-      password: {
+      uuid_from: {
+        type: DataTypes.STRING,
+        validate: {
+          isNull: { msg: 'User from is required' },
+        }
+      },
+      message: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          min: 8
+          isNull: { msg: 'Messages is required' }
         }
+      },
+      msg_status: {
+        type: DataTypes.ENUM('read', 'unread'),
+        defaultValue: 'unread',
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -47,6 +53,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('users_table');
+    await queryInterface.dropTable('user_messages_table');
   }
 };

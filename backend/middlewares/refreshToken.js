@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config/config.js');
-const RefreshToken = require('../models/refreshtoken');
+const config = require('../config/configs.js');
+const { RefreshToken } = require('../models');
 
 const refreshUserTokens = async (req, res) => {
     const { refreshToken } = req.body;

@@ -1,5 +1,5 @@
 <template>
-  <div class="column q-pt-md q-px-md rounded-borders relative-position">
+  <div class="column rounded-borders relative-position full-height">
     <div class="row justify-between">
       <div class="row q-gutter-x-sm items-center">
         <span class="text-h6 text-capitalize">lance phillip descartin</span>
@@ -28,7 +28,7 @@
     </div>
     <q-separator class="q-my-md"/>
     <q-scroll-area
-      style="height: calc(100vh - 220px); width: 100%; box-shadow: inset 0px 0px 21px -7px rgba(0, 0, 0, 1);"
+      style="height: calc(100vh - 195px); width: 100%; box-shadow: inset 0px 0px 21px -7px rgba(0, 0, 0, 1);"
       class="q-px-md q-py-sm"
     >
       <q-chat-message
@@ -96,7 +96,7 @@
         bg-color="primary"
       />
     </q-scroll-area>
-    <div class="column q-px-md absolute-bottom">
+    <div class="column ">
       <q-input
         placeholder="Type something..."
         dense
@@ -107,10 +107,13 @@
 </template>
 
 <script setup lang="ts">
-  import { date } from 'quasar';
-  const formattedString = (date_send: string) => date.formatDate(date_send, 'MMM-D-YYYY');
+import { onMounted } from 'vue';
+import { date } from 'quasar';
 
-  const onItemClick = () => {
-    console.log('clicked');
-  }
+const formattedString = (date_send: string) => date.formatDate(date_send, 'MMM-D-YYYY');
+
+const onItemClick = () => {
+  console.log('clicked');
+}
+
 </script>

@@ -2,9 +2,11 @@ const socket = require('./utils/socket');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 
 const authRoute = require('./routes/auth.route');
 const refreshRoute = require('./routes/refresh.route');
+const userRoute = require('./routes/user.route');
 
 const app = express();
 const PORT = process.env.PORT || 4300;
@@ -21,6 +23,7 @@ const corsOptions = {
   }
 }
 
+app.use(express.static(path.join(__dirname, 'publiv')));
 app.use(express.json());
 app.use(bodyParser.json());
 
@@ -33,6 +36,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/', authRoute);
 app.use('/api/', refreshRoute);
+app.use('/api/', userRoute);
 
 socket.initializeSocket(http);
 

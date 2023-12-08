@@ -9,19 +9,22 @@ img
       <img :src="Logo" />
       <q-form
         greedy
-        @submit.prevent="handleLogin"
+        @submit.prevent="sendForm"
+        autocomplete="off"
         class="column shadow-2 q-pa-md"
         style="width: 320px"
       >
         <span class="text-h5 text-weight-light text-primary q-mb-md">Login</span>
-        <span class="text-subtitle1 text-weight-light text-primary">Username</span>
+        <span class="text-subtitle1 text-weight-light text-primary">Email address</span>
         <q-input
           dense
           lazy-rules
+          type="email"
           :rules="[
-            val => val && val.length > 0 || 'Enter your username'
+            val => val && val.length > 0 || 'Enter your email address *',
+
           ]"
-          v-model="form.username"
+          v-model="form.email"
         />
         <span class="text-subtitle1 text-weight-light text-primary q-mt-sm">Password</span>
         <q-input
@@ -29,7 +32,7 @@ img
           lazy-rules
           :type="!isPwd ? 'password' : 'text'"
           :rules="[
-            val => val && val.length > 0 || 'Enter your password'
+            val => val && val.length > 0 || 'Enter your password *'
           ]"
           v-model="form.password"
         >
@@ -66,6 +69,8 @@ import { SpinnerTail } from 'src/utils/loading';
 import { baseApi } from 'boot/axios';
 import { useUserStore } from 'stores/user-store';
 import { useRouter } from 'vue-router';
+import { socket } from 'src/utils/socket';
+import { Notify, debounce } from 'quasar';
 
 defineComponent({
   name: 'LoginPage'
@@ -80,15 +85,35 @@ const userStore = useUserStore();
 const router = useRouter()
 
 
-const handleLogin = async () => {
+const handleLogin = debounce(async () => {
   try {
-    const response = await baseApi.post('/login', { form: form.value });
-    userStore.initTokens(response.data);
-    SpinnerTail(true, 'Redirecting to homepage please wait...');
-    setTimeout(() => {
-      SpinnerTail(false);
+    const response = await baseApi.post('/auth/login', { email: form.value.email, password: form.value.password });
+
+    if(response.data.status === 200) {
+      userStore.initTokens(response.data);
+      SpinnerTail(true, 'Redirecting to homepage please wait...');
+      socket.emit('user_connected');
       router.push('/');
-    }, 3000);
+    } else {
+      Notify.create({
+        message: response.data.message,
+        position: 'top',
+        type: 'negative',
+        timeout: 2300,
+        progress: true
+      });
+    }
+  } catch (error) {
+    throw error;
+  } finally {
+    SpinnerTail(false);
+  }
+}, 1500);
+
+const sendForm = async () => {
+  try {
+    SpinnerTail(true, 'Loading...');
+    await handleLogin();
   } catch (error) {
     throw error;
   }

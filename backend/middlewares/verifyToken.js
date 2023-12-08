@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config/config.js');
+const config = require('../config/configs.js');
 
 const verifyToken = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -14,10 +14,10 @@ const verifyToken = async (req, res, next) => {
     }
 
     const token = authHeader.slice(7);
-
+    
     jwt.verify(token, config.token.accessSecret, (err, decoded) => {
         if (err) {
-            console.error('Something is wrong in verifying TOKEN', err);
+            console.error('Something is wrong in verifying TOKEN:\n', err);
             return res.status(401).json({ message: 'Unauthorize: Invalid TOKEN'});
         }
 
