@@ -10,7 +10,6 @@ const register = async (firstname, lastname, email, password ) => {
     if (result) {
       return {
         message: 'Registered successfully',
-        ...result.dataValues,
         status: 201
       }
     } else {
@@ -23,49 +22,51 @@ const register = async (firstname, lastname, email, password ) => {
 }
 
 const login = async (email, password) => {
-  try {
-    const _result = await User.findOne({ where: { email } });
-    const user = _result.toJSON();
+    try {
+        const _result = await User.findOne({ where: { email } });
     
-    if (user === null) {
-      return {
-        message: 'Email incorrect or not registered',
-        status: 409,
-      }
-    }
-
-    const result = await new Promise((resolve, reject) => {
-      bcrypt.compare(
-        password,
-        user.password,
-        (error, result) => {
-          if (error) {
-            reject({
-              error
-            });
-          } else if (result) {
-            signJWT(user,(_error, accessToken, refreshToken) => {
-              if (_error) {
-                reject({
-                  error,
-                });
-              } else if (accessToken && refreshToken) {
-                resolve({
-                  status: 200,
-                  accessToken,
-                  refreshToken
-                });
-              }
-            })
-          } else {
-            reject({
-              message: 'Login failed password incorrect',
-              status: 409
-            });
-          }
+        if (_result === null) {
+            return {
+                message: 'Email incorrect or not registered',
+                status: 409,
+            }
         }
-      )
+
+        const user = _result.toJSON();
+
+        const result = await new Promise((resolve, reject) => {
+        bcrypt.compare(
+            password,
+            user.password,
+            (error, result) => {
+            if (error) {
+                reject({
+                    error
+                });
+            } else if (result) {
+                signJWT(user,async (_error, accessToken, refreshToken) => {
+                    if (_error) {
+                        reject({
+                            error,
+                        });
+                    } else if (accessToken && refreshToken) {
+                        await User.update({ user_status: 'online' }, { where: { uuid: user.uuid }});
+                        resolve({
+                            status: 200,
+                            accessToken,
+                            refreshToken
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    message: 'Login failed password incorrect',
+                    status: 409
+                });
+            }
+        })
     });
+
     return result;
   } catch (error) {
     console.error(error);

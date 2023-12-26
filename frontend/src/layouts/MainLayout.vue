@@ -1,73 +1,55 @@
 <template>
-  <q-layout view="hHr LpR lFr">
+  <q-layout :view="Platform.is.mobile ? 'hhh lpR fFf' : 'hHr LpR lFr'">
 
-    <q-header elevated >
+    <q-header bordered class="bg-blue-1 text-dark">
       <q-toolbar>
-        <q-btn dense flat size="lg" icon="mdi-sort-variant" @click="toggleLeftDrawer" />
+        <q-btn v-if="Platform.is.mobile" dense flat size="lg" icon="mdi-sort-variant" @click="toggleLeftDrawer" />
 
         <q-space/>
 
-        <q-item>
-          <q-item-section avatar>
-            <q-avatar color="blue-10" text-color="grey-2">
-              L
-            </q-avatar>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Vladiere Kazhu Blecks</q-item-label>
-            <q-item-label caption>Available</q-item-label>
-          </q-item-section>
+        <span class="text-capitalize">{{ userStore.user.firstname }} {{ userStore.user.lastname }}</span>
 
-          <q-item-section side top>
-            <q-btn-dropdown color="grey-9" flat dense dropdown-icon="mdi-chevron-down">
-              <q-list dense>
-                <q-item clickable v-close-popup @click="onItemClick('profile')">
-                  <q-item-section avatar>
-                    <q-icon name="mdi-account" />
-                  </q-item-section>
-
-                  <q-item-section> Profile </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="onItemClick('logout')">
-                  <q-item-section avatar>
-                    <q-icon name="mdi-logout" />
-                  </q-item-section>
-
-                  <q-item-section> Logout </q-item-section>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
-          </q-item-section>
-        </q-item>
+        <q-btn flat label="Logout" no-caps @click="onItemClick"/>
 
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      elevated
+      bordered
       show-if-above
       v-model="leftDrawerOpen"
+      v-if="Platform.is.mobile"
       side="left"
-
       :mini="miniState"
-      :width="200"
+      :width="Platform.is.mobile ? 220 : 200"
       :breakpoint="500"
       class="bg-blue-1"
     >
         <q-list padding class="q-mt-lg">
-            <q-item clickable v-ripple to="/">
+
+            <q-item v-if="Platform.is.mobile" clickable v-ripple :to="{ name: 'user_home', query: { _: 'chats' }}">
               <q-item-section avatar>
-                <q-icon color="primary" name="mdi-message-text" />
+                <q-icon color="primary" name="mdi-account-group" />
               </q-item-section>
-              <q-tooltip class="bg-grey-10 text-grey-2" :delay="200" anchor="bottom right" self="top middle">Messages</q-tooltip>
+
+              <q-item-section>
+                User Chats
+              </q-item-section>
+
+              <q-tooltip class="bg-grey-10 text-grey-2" :delay="200" anchor="bottom right" self="top middle">User Chats</q-tooltip>
             </q-item>
 
-            <q-item clickable v-ripple to="/settings">
+            <q-item v-if="Platform.is.mobile" clickable v-ripple :to="{ name: 'user_home', query: { _: 'available' }}">
               <q-item-section avatar>
-                <q-icon color="primary" name="mdi-cog-outline" />
+                <q-icon color="primary" name="mdi-web" />
               </q-item-section>
-              <q-tooltip class="bg-grey-10 text-grey-2" :delay="200" anchor="bottom right" self="top middle">Settings</q-tooltip>
+
+              <q-item-section>
+                Available Users
+              </q-item-section>
+
+
+              <q-tooltip class="bg-grey-10 text-grey-2" :delay="200" anchor="bottom right" self="top middle">Available users</q-tooltip>
             </q-item>
 
           </q-list>
@@ -84,14 +66,17 @@
 import { ref, onMounted } from 'vue';
 import { useUserStore } from 'stores/user-store';
 import { useRouter } from 'vue-router';
-import { debounce } from 'quasar';
+import { debounce, Platform } from 'quasar';
 import { SpinnerTail } from 'src/utils/loading';
 import userDetails from 'src/utils/getUser';
+import { socket } from 'src/utils/socket';
+import { jwtDecode } from 'jwt-decode';
 
 const miniState = ref(true);
 const router = useRouter();
 const userStore = useUserStore();
 const leftDrawerOpen = ref(false);
+const decode = jwtDecode(userStore.token);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -100,6 +85,7 @@ const toggleLeftDrawer = () => {
 const handleLogoutUser = debounce(async() => {
   try {
     userStore.logout();
+    socket.emit('user_logout', decode.uuid);
     router.push('/auth/login')
   } catch (error) {
     throw error;
@@ -108,17 +94,15 @@ const handleLogoutUser = debounce(async() => {
   }
 }, 1500);
 
-const onItemClick = async (options: string) => {
-  console.log(options)
-  if (options === 'logout') {
-    SpinnerTail(true,'Logging out');
-    await handleLogoutUser();
-  } else {
-    router.push({ name: options });
-  }
+const onItemClick = async () => {
+  SpinnerTail(true,'Logging out');
+  await handleLogoutUser();
 }
 
 onMounted(async () => {
   await userDetails.getUserDetails();
+
+  socket.emit('online_user',decode.uuid);
+
 })
 </script>

@@ -14,10 +14,6 @@ module.exports = {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4
       },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
       uuid_to: {
         type: DataTypes.STRING,
         validate: {
@@ -31,7 +27,7 @@ module.exports = {
         }
       },
       message: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
         validate: {
           isNull: { msg: 'Messages is required' }

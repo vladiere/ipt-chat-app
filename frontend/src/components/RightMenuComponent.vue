@@ -5,42 +5,62 @@
 </style>
 
 <template>
-  <div class="column q-pa-md shadow-3">
+  <div  class="column q-pa-md">
     <div class="row justify-between items-center" >
-      <span class="text-h6 text-primary">Pictures sent</span>
-      <q-btn
-        flat
-        dense
-        round
-        icon="mdi-delete-empty-outline"
-        color="primary"
-      >
-        <q-tooltip class="bg-grey-10 text-grey-2" :delay="200" anchor="bottom left" self="top middle">Delete all pictures</q-tooltip>
-      </q-btn>
+      <span class="text-h6 text-primary">Available users</span>
     </div>
 
-    <q-separator class="q-my-md" />
+    <q-separator class="q-my-md" width="100%"/>
 
-    <div v-if="false" class="flex flex-center text-h6 text-weight-light text-primary" style="height: calc(100vh - 185px)">
-      Unfortunately, no pictures were sent in the message.
+    <div v-if="data_object.length === 0" class="flex flex-center text-h6 text-weight-light text-primary" style="height: calc(100vh - 185px)">
+      Unfortunately, no users are available right now.
     </div>
 
-    <q-scroll-area
-      style="height: calc(100vh - 185px); width: 100%"
+    <div class="column q-gutter-y-md">
+      <q-virtual-scroll
+        style="max-height: calc(100vh - 186px);"
+        :items="data_object"
+        separator
+        v-slot="{ item, index }"
       >
-      <div class="row q-gutter-md justify-center">
-        <q-card class="my-card" v-for="img in 10" :key="img">
-          <q-img :src="'https://picsum.photos/1200/900?random=' + img" fit="fill" height="130px">
-            <div class="absolute-bottom text-subtitle2 text-center">
-              Title
-            </div>
-          </q-img>
-        </q-card>
-      </div>
-    </q-scroll-area>
+          <q-item :key="index" v-if="item.uuid !== decode.uuid" class="q-my-sm" clickable v-ripple @click="userClicked(item.uuid)">
+            <q-item-section avatar>
+              <q-avatar color="primary" text-color="white">
+                {{ item.firstname.split('')[0].toUpperCase() }}
+                <q-badge rounded color="positive" floating  class="q-mt-xs q-mr-xs"/>
+              </q-avatar>
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label class="text-capitalize">{{ item.firstname }} {{ item.lastname }}</q-item-label>
+              <q-item-label caption lines="1">{{ item.email }}</q-item-label>
+            </q-item-section>
+
+          </q-item>
+      </q-virtual-scroll>
+    </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
+import { jwtDecode } from 'jwt-decode';
+import { useUserStore } from 'stores/user-store';
+import { useRouter } from 'vue-router';
 
+export interface OnlineUsersProps {
+  data_object: object
+}
+
+withDefaults(defineProps<OnlineUsersProps>(), {
+  data_object: [] as object
+});
+
+const router = useRouter()
+const userStore = useUserStore();
+const decode = jwtDecode(userStore.token);
+
+const userClicked = (uuid: string) => {
+  router.replace({ name: 'user_chat', params: { id: uuid }})
+}
 </script>

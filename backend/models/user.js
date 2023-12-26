@@ -9,13 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ UserMessages, MessageImage }) {
+    static associate({ UserMessages }) {
       // define association here
-      this.hasMany(UserMessages, { foreignKey: 'user_id', as: 'user' });
-      this.hasMany(MessageImage, { foreignKey: 'user_id', as: 'user_img' })
+      this.hasMany(UserMessages, { foreignKey: 'uuid_from', as: 'sentMessages' });
     }
 
     toJSON() {
+      return { ...this.get(), id: undefined }
+    }
+
+    getUser() {
       return { ...this.get(), id: undefined, password: undefined }
     }
   }
@@ -55,6 +58,11 @@ module.exports = (sequelize, DataTypes) => {
         notNull: { msg: 'Password is require' }
       }
     },
+    user_status: {
+      type: DataTypes.ENUM,
+      values: ['online', 'offline'],
+      defaultValue: 'offline'
+    }
   }, {
     sequelize,
     tableName: 'users_table',

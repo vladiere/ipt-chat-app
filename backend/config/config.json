@@ -1,15 +1,10 @@
 {
   "development": {
-    "username": "fl0user",
-    "password": "x0QaHNPYF9du",
-    "database": "iptchatapp",
-    "host": "ep-holy-scene-54372505.ap-southeast-1.aws.neon.fl0.io",
-    "dialect": "postgres",
-    "dialectOptions": {
-      "ssl": {
-        "require": true
-      }
-    }
+    "username": "vladiere",
+    "password": "",
+    "database": "iptchat",
+    "host": "localhost",
+    "dialect": "postgres"
   },
   "test": {
     "username": "root",
@@ -19,15 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "fl0user",
-    "password": "x0QaHNPYF9du",
-    "database": "iptchatapp",
-    "host": "ep-holy-scene-54372505.ap-southeast-1.aws.neon.fl0.io",
-    "dialect": "postgres",
-    "dialectOptions": {
-      "ssl": {
-        "require": true
-      }
-    }
+    "username": "",
+    "password": "",
+    "database": "",
+    "host": "",
+    "dialect": ""
   }
 }

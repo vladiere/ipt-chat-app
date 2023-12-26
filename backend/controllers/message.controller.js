@@ -1,11 +1,11 @@
 const messageService = require('../services/message.service');
 
-const sendMessageTo = async (data) => {
+const sendMessageTo = async (uuid_to, uuid_from, message) => {
   try {
-    const result = messageService.sendMessageTo({ uuid_to: data.uuid_to, uuid_from: data.uuid_from, message: data.message });
+    const result = messageService.sendMessageTo(uuid_to, uuid_from, message);
 
     if (result) {
-      return data;
+      return result;
     }
 
     return result;
@@ -33,7 +33,19 @@ const sendImageTo = async (uuid_to, uuid_from, image) => {
   }
 }
 
+const getSingleMessagesForEveryRecipients = async (req, res) => {
+    try {
+        const { uuid } = req.body;
+
+        const result = await messageService.getSingleMessagesForEveryRecipients(uuid);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
 module.exports = {
-  sendMessageTo,
-  sendImageTo,
+    sendMessageTo,
+    sendImageTo,
+    getSingleMessagesForEveryRecipients,
 }

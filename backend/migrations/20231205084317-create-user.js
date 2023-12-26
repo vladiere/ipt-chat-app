@@ -43,6 +43,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
+      },
+      user_status: {
+        type: DataTypes.ENUM,
+        values: ['online', 'offline'],
+        defaultValue: 'offline'
       }
     });
   },

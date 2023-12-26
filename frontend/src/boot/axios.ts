@@ -17,21 +17,20 @@ const userStore = useUserStore();
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-// const api = axios.create({ baseURL: 'http://localhost:8080/api' });
-// const baseApi = axios.create({ baseURL: 'http://localhost:8080/api' });
+// const api = axios.create({ baseURL: 'http://localhost:4545/api' });
+// const baseApi = axios.create({ baseURL: 'http://localhost:4545/api' });
 
 // const api = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
 // const baseApi = axios.create({ baseURL: 'https://iptchatapp.1.us-1.fl0.io/api/' });
 //
-const api = axios.create({ baseURL: 'http://localhost:8080/api/' });
-const baseApi = axios.create({ baseURL: 'http://localhost:8080/api/' });
+const api = axios.create({ baseURL: 'http://192.168.48.193:4545/api/' });
+const baseApi = axios.create({ baseURL: 'http://192.168.48.193:4545/api/' });
 
 const refreshToken = async () => {
   try {
     const response = await api.post('/auth/refresh', {
       refreshToken: userStore.access,
     });
-    console.log(response)
 
     return response.data;
   } catch (error) {
@@ -53,13 +52,11 @@ api.interceptors.response.use(
   response => response,
   async (error) => {
     const prevRequest = error?.config;
-    console.log(error)
 
-    if(error?.response.status === 401 && !prevRequest?.sent) {
+    if(error?.response?.status === 401 && !prevRequest?.sent) {
       prevRequest.sent = true;
 
       const token = await refreshToken();
-      console.log(token)
 
       if (token) {
         prevRequest.headers['Authorization'] = `Bearer ${token.accessToken}`

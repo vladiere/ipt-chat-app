@@ -1,7 +1,8 @@
 export interface IUser {
+  uuid: string;
   firstname: string;
   lastname: string;
-  username: string;
-  create_at: string;
-  updated_at: string;
+  email: string;
+  updatedAt: string;
+  createdAt: string;
 }

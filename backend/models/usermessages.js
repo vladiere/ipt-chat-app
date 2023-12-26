@@ -11,11 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User }) {
       // define association here
-      this.belongsTo(User, { foreignKey: 'user_id', as: 'messages' });
+        this.belongsTo(User, { foreignKey: 'uuid_from', as: 'fromUser' });
     }
 
     toJSON() {
       return { ...this.get(), id: undefined, }
+    }
+
+    getUserMessages() {
+      return { ...this.get(), id: undefined }
     }
     
   }
@@ -40,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     message: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       validate: {
         notNull: { msg: 'Message is required' }

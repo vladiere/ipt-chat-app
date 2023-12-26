@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User }) {
       // define association here
-      this.belongsTo(User, { foreignKey: 'user_id', as: 'msg_image' })
+      this.belongsTo(User, { foreignKey: 'uuid_to', as: 'msg_image' })
     }
   }
   MessageImage.init({

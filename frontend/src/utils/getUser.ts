@@ -13,7 +13,7 @@ const getUserDetails = async() => {
       }
     });
 
-    console.log(response.data);
+    userStore.initUser(response.data);
   } catch (error) {
     throw error;
   }

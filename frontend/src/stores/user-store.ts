@@ -13,11 +13,11 @@ export const useUserStore = defineStore('user', {
     getToken: (state) => state.token,
     getAccess: (state) => state.access,
     isAuthenticated: (state) => state.authenticated,
+    getUser: (state) => state.user,
   },
 
   actions: {
     initTokens (tokens: object) {
-      console.log(tokens)
       this.token = tokens.accessToken;
       this.access = tokens.refreshToken;
       this.authenticated = true;
